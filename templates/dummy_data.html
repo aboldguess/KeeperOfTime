@@ -11,6 +11,39 @@
 
 {% block content %}
 <h2>Dummy Data</h2>
+
+<h3>Add Dummy Project</h3>
+<form method="POST" action="{{ url_for('dummy_data_page') }}">
+    <input type="hidden" name="action" value="add_dummy_project">
+    <button type="submit">Add Dummy Project</button>
+</form>
+
+<h3>Add Dummy User</h3>
+<form method="POST" action="{{ url_for('dummy_data_page') }}">
+    <input type="hidden" name="action" value="add_dummy_user">
+    <label>Hours per Week:</label>
+    <input type="number" name="hours_per_week" value="35" step="0.1">
+    <label>Start Date:</label>
+    <input type="date" name="start_date" value="{{ default_start }}">
+    <label>End Date:</label>
+    <input type="date" name="end_date" value="{{ default_end }}">
+    <div>
+        {% for project in projects %}
+        <strong>{{ project.name }}</strong>
+        {% for wp in project.work_packages %}
+        <div style="margin-left:20px;">
+            <em>{{ wp.name }}</em>
+            {% for task in wp.tasks %}
+            <div style="margin-left:40px;">
+                <label><input type="checkbox" name="tasks" value="{{ task.id }}"> {{ task.name }}</label>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+    <button type="submit">Add Dummy User</button>
+</form>
 <table>
     <thead>
         <tr>

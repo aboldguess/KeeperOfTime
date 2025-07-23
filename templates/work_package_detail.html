@@ -16,6 +16,8 @@
     <thead>
         <tr>
             <th>Task Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
             <th>Total Hours</th>
             <th>Users</th>
             <th>Details</th>
@@ -25,6 +27,8 @@
         {% for item in task_data %}
         <tr>
             <td>{{ item.task.name }}</td>
+            <td>{{ item.task.start_date or '' }}</td>
+            <td>{{ item.task.end_date or '' }}</td>
             <td>{{ item.total_hours }}</td>
             <td>{{ item.users | join(', ') }}</td>
             <td>
@@ -36,6 +40,8 @@
         <tr>
             <form method="POST" action="{{ url_for('work_package_detail', work_package_id=work_package.id) }}">
                 <td><input type="text" name="task_name" placeholder="New Task Name" required></td>
+                <td><input type="date" name="start_date"></td>
+                <td><input type="date" name="end_date"></td>
                 <td colspan="2"></td>
                 <td><button type="submit">Add Task</button></td>
             </form>

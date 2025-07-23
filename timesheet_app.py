@@ -90,6 +90,9 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     work_package_id = db.Column(db.Integer, db.ForeignKey('work_package.id'), nullable=False)
+    # Optional schedule information for basic project management
+    start_date = db.Column(db.Date, nullable=True)
+    end_date = db.Column(db.Date, nullable=True)
 
     timesheets = db.relationship('Timesheet', backref='task', lazy=True)
 
@@ -919,9 +922,19 @@ def work_package_detail(work_package_id):
     if request.method == 'POST':
         # Get form data
         task_name = request.form['task_name']
+        # Optional start and end dates for the task
+        start_str = request.form.get('start_date')
+        end_str = request.form.get('end_date')
+        start_date = datetime.strptime(start_str, '%Y-%m-%d').date() if start_str else None
+        end_date = datetime.strptime(end_str, '%Y-%m-%d').date() if end_str else None
 
-        # Create new task
-        new_task = Task(name=task_name, work_package_id=work_package.id)
+        # Create new task with schedule data
+        new_task = Task(
+            name=task_name,
+            work_package_id=work_package.id,
+            start_date=start_date,
+            end_date=end_date,
+        )
         db.session.add(new_task)
         db.session.commit()
 

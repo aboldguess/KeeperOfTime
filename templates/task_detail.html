@@ -13,6 +13,10 @@
 
 {% block content %}
 <h2>Bookings by Users for Task: {{ task.name }}</h2>
+<p>
+    Start: {{ task.start_date or 'N/A' }}<br>
+    End: {{ task.end_date or 'N/A' }}
+</p>
 <table>
     <thead>
         <tr>

@@ -359,20 +359,40 @@ def create_dummy_user(task_ids, hours_per_week=35, start_date=None, end_date=Non
     current = start
     while current <= end:
         week_end = min(current + timedelta(days=6), end)
-        # Random distribution weights for tasks
+
+        # Convert hours to an integer value for the week
+        week_hours = int(round(hours_per_week))
+
+        # Generate random weights and derive a base integer allocation per task
         weights = [random.random() for _ in tasks]
         total = sum(weights)
-        for weight, task in zip(weights, tasks):
-            hours = round(hours_per_week * (weight / total), 2)
-            # Pick a random weekday within the week
+        allocations = [int(week_hours * (w / total)) for w in weights]
+
+        # Distribute any remaining hours randomly so totals match week_hours
+        remaining = week_hours - sum(allocations)
+        for _ in range(remaining):
+            allocations[random.randrange(len(allocations))] += 1
+
+        # Create one timesheet entry per task for this week
+        for task, hrs in zip(tasks, allocations):
+            if hrs <= 0:
+                continue  # Skip tasks with no allocated hours
+
+            # Pick a random weekday within the week for the entry
             day_offset = random.randint(0, 4)
             entry_date = current + timedelta(days=day_offset)
             if entry_date > week_end:
                 entry_date = week_end
-            ts = Timesheet(user_id=new_user.id, task_id=task.id,
-                           date=entry_date, hours=hours,
-                           description='Dummy booking')
+
+            ts = Timesheet(
+                user_id=new_user.id,
+                task_id=task.id,
+                date=entry_date,
+                hours=hrs,
+                description='Dummy booking'
+            )
             db.session.add(ts)
+
         db.session.commit()
         current = week_end + timedelta(days=1)
 

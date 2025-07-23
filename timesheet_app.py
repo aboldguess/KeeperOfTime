@@ -70,6 +70,8 @@ def apply_schema_updates():
     add_column('task', 'start_date', 'DATE')
     add_column('task', 'end_date', 'DATE')
     add_column('task', 'budget_hours', 'FLOAT')
+    # Track manually entered progress percentage for each task
+    add_column('task', 'actual_progress', 'FLOAT')
 
 
 
@@ -124,6 +126,8 @@ class Task(db.Model):
     end_date = db.Column(db.Date, nullable=True)
     # Budgeted hours for this task
     budget_hours = db.Column(db.Float, nullable=True)
+    # Actual completion percentage entered by an administrator
+    actual_progress = db.Column(db.Float, nullable=True, default=0)
 
     timesheets = db.relationship('Timesheet', backref='task', lazy=True)
 
@@ -1043,6 +1047,55 @@ def project_detail(project_id):
 
     return render_template('project_detail.html', project=project, wp_data=wp_data)
 
+
+@app.route('/admin_dashboard/projects/<int:project_id>/gantt')
+@admin_required
+def project_gantt(project_id):
+    """Display a Gantt chart for all tasks under a project."""
+    project = Project.query.get_or_404(project_id)
+
+    # Collect each task alongside total hours booked so we can
+    # determine the percentage of its budget that has been spent.
+    entries = (
+        db.session.query(
+            Task,
+            db.func.sum(Timesheet.hours).label('spent')
+        )
+        .join(WorkPackage)
+        .outerjoin(Timesheet, Timesheet.task_id == Task.id)
+        .filter(WorkPackage.project_id == project_id)
+        .group_by(Task.id)
+        .all()
+    )
+
+    # Build the task data structure expected by frappe-gantt
+    tasks = []
+    for task, spent in entries:
+        spent = spent or 0
+        if task.budget_hours and task.budget_hours > 0:
+            percent = (spent / task.budget_hours) * 100
+        else:
+            percent = 0
+
+        # Determine styling class based on budget consumption
+        if percent < 50:
+            cls = 'budget-low'
+        elif percent < 80:
+            cls = 'budget-mid'
+        else:
+            cls = 'budget-high'
+
+        tasks.append({
+            'id': task.id,
+            'name': task.name,
+            'start': (task.start_date or date.today()).isoformat(),
+            'end': (task.end_date or date.today()).isoformat(),
+            'progress': task.actual_progress or 0,
+            'custom_class': cls,
+        })
+
+    return render_template('project_gantt.html', project=project, tasks=tasks)
+
 @app.route('/admin_dashboard/work_packages/<int:work_package_id>', methods=['GET', 'POST'])
 @admin_required
 def work_package_detail(work_package_id):
@@ -1123,6 +1176,19 @@ def user_task_entries(task_id, user_id):
     timesheet_entries = Timesheet.query.filter_by(task_id=task_id, user_id=user_id).all()
 
     return render_template('user_task_entries.html', task=task, user=user, timesheet_entries=timesheet_entries)
+
+
+@app.route('/admin_dashboard/tasks/update_progress', methods=['POST'])
+@admin_required
+def update_task_progress():
+    """Update manually entered progress percentage for a task."""
+    task_id = request.form.get('task_id', type=int)
+    progress = request.form.get('progress', type=float)
+    # Retrieve the task and store the provided progress value
+    task = Task.query.get_or_404(task_id)
+    task.actual_progress = progress
+    db.session.commit()
+    return '', 204
 
 @app.route('/admin_dashboard/users', methods=['GET', 'POST'])
 @admin_required

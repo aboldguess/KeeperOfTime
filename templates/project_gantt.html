@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Gantt Chart{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('projects_page') }}">Projects</a> /
+    <a href="{{ url_for('project_detail', project_id=project.id) }}">Work Packages</a> /
+    <span>Gantt Chart</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Gantt Chart - {{ project.name }}</h2>
+<div id="gantt"></div>
+<script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.css">
+<script>
+    // Tasks data injected from Flask
+    var tasks = {{ tasks|tojson }};
+
+    // Initialise the Gantt chart
+    var gantt = new Gantt("#gantt", tasks, {
+        custom_popup_html: function(task) {
+            return '<div class="details-container">' +
+                   '<b>' + task.name + '</b><br>' +
+                   '<button onclick="editProgress(' + task.id + ',' + task.progress + ')">Edit progress</button>' +
+                   '</div>';
+        }
+    });
+
+    // Prompt for new progress percentage then update via AJAX
+    function editProgress(id, current) {
+        var val = prompt('Enter actual progress (%)', current);
+        if (val === null) return;
+        $.post('{{ url_for('update_task_progress') }}', {
+            task_id: id,
+            progress: val
+        }).done(function(){ location.reload(); });
+    }
+</script>
+{% endblock %}

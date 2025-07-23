@@ -319,3 +319,9 @@ tr.detail-row {
 tr.level-1 td { padding-left: 20px; }
 tr.level-2 td { padding-left: 40px; }
 tr.level-3 td { padding-left: 60px; }
+
+/* Gantt bar colours based on budget usage */
+.bar-budget-low { fill: #70AD47; }
+.bar-budget-mid { fill: #ff9f38; }
+.bar-budget-high { fill: #e74c3c; }
+

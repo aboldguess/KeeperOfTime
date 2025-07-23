@@ -29,17 +29,26 @@
     <input type="date" name="end_date" value="{{ default_end }}">
     <div>
         {% for project in projects %}
-        <strong>{{ project.name }}</strong>
-        {% for wp in project.work_packages %}
-        <div style="margin-left:20px;">
-            <em>{{ wp.name }}</em>
-            {% for task in wp.tasks %}
-            <div style="margin-left:40px;">
-                <label><input type="checkbox" name="tasks" value="{{ task.id }}"> {{ task.name }}</label>
+        <div class="project-block" data-project-id="{{ project.id }}">
+            <!-- Checkbox to toggle all tasks within this project -->
+            <label>
+                <input type="checkbox" class="project-toggle" data-project-id="{{ project.id }}">
+                <strong>{{ project.name }}</strong>
+            </label>
+            {% for wp in project.work_packages %}
+            <div style="margin-left:20px;">
+                <em>{{ wp.name }}</em>
+                {% for task in wp.tasks %}
+                <div style="margin-left:40px;">
+                    <label>
+                        <!-- Individual task checkbox -->
+                        <input type="checkbox" name="tasks" value="{{ task.id }}" class="task-checkbox" data-project-id="{{ project.id }}"> {{ task.name }}
+                    </label>
+                </div>
+                {% endfor %}
             </div>
             {% endfor %}
         </div>
-        {% endfor %}
         {% endfor %}
     </div>
     <button type="submit">Add Dummy User</button>
@@ -90,4 +99,14 @@
         </div>
     {% endif %}
 {% endwith %}
+<script>
+    $(function(){
+        // Attach change handler to each project checkbox
+        $('.project-toggle').on('change', function(){
+            const pid = $(this).data('project-id');
+            // Select all task checkboxes for this project and mirror the state
+            $('.task-checkbox[data-project-id="' + pid + '"]').prop('checked', this.checked);
+        });
+    });
+</script>
 {% endblock %}

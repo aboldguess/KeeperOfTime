@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Dummy Data{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a> /
+    <span>Dummy Data</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Dummy Data</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dummies %}
+        <tr>
+            <form method="POST" action="{{ url_for('dummy_data_page') }}">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="dummy_id" value="{{ item.id }}">
+                <td><input type="text" name="name" value="{{ item.name }}" required></td>
+                <td><input type="text" name="value" value="{{ item.value }}"></td>
+                <td>
+                    <button type="submit">Update</button>
+            </form>
+            <form method="POST" action="{{ url_for('dummy_data_page') }}" style="display:inline;">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="dummy_id" value="{{ item.id }}">
+                <button type="submit">Delete</button>
+            </form>
+                </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <form method="POST" action="{{ url_for('dummy_data_page') }}">
+                <input type="hidden" name="action" value="add">
+                <td><input type="text" name="name" placeholder="Name" required></td>
+                <td><input type="text" name="value" placeholder="Value"></td>
+                <td><button type="submit">Add</button></td>
+            </form>
+        </tr>
+    </tbody>
+</table>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+{% endblock %}

@@ -695,12 +695,14 @@ def admin_reports():
         db.func.sum(Timesheet.hours)
     ).join(Timesheet).group_by(User.id).all()
 
-    # Total hours logged per project
+    # Total hours logged per project and the original budget
     project_hours = db.session.query(
         Project.id,
         Project.name,
-        db.func.sum(Timesheet.hours)
-    ).join(WorkPackage).join(Task).join(Timesheet).group_by(Project.id).all()
+        db.func.sum(Timesheet.hours),
+        Project.budget_hours,
+    ).join(WorkPackage).join(Task).join(Timesheet)\
+     .group_by(Project.id, Project.name, Project.budget_hours).all()
 
     return render_template(
         'reports.html',
@@ -713,18 +715,21 @@ def admin_reports():
 def report_user_detail(user_id):
     """Return hours for a user broken down by project, work package and task."""
     # Aggregate hours by project/work package/task for the user
+    # Include the task budget so the UI can show remaining hours
+    # Work package budgets are returned for progress tracking
     entries = (
         db.session.query(
             Project.name.label('project'),
             WorkPackage.name.label('work_package'),
             Task.name.label('task'),
-            db.func.sum(Timesheet.hours).label('hours')
+            db.func.sum(Timesheet.hours).label('hours'),
+            Task.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .join(WorkPackage, Task.work_package_id == WorkPackage.id)
         .join(Project, WorkPackage.project_id == Project.id)
         .filter(Timesheet.user_id == user_id)
-        .group_by(Project.name, WorkPackage.name, Task.name)
+        .group_by(Project.name, WorkPackage.name, Task.name, Task.budget_hours)
         .all()
     )
 
@@ -734,6 +739,7 @@ def report_user_detail(user_id):
             'work_package': row.work_package,
             'task': row.task,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]
@@ -748,12 +754,13 @@ def report_project_detail(project_id):
         db.session.query(
             WorkPackage.name.label('work_package'),
             Task.name.label('task'),
-            db.func.sum(Timesheet.hours).label('hours')
+            db.func.sum(Timesheet.hours).label('hours'),
+            Task.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .join(WorkPackage, Task.work_package_id == WorkPackage.id)
         .filter(WorkPackage.project_id == project_id)
-        .group_by(WorkPackage.name, Task.name)
+        .group_by(WorkPackage.name, Task.name, Task.budget_hours)
         .all()
     )
 
@@ -762,6 +769,7 @@ def report_project_detail(project_id):
             'work_package': row.work_package,
             'task': row.task,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]
@@ -779,18 +787,19 @@ def report_project_detail(project_id):
 @admin_required
 def report_user_projects(user_id):
     """Return hours for a user grouped by project."""
-    # Sum hours for each project this user has booked time on
+    # Sum hours for each project this user has booked time on and include budget
     entries = (
         db.session.query(
             Project.id.label('project_id'),
             Project.name.label('project'),
             db.func.sum(Timesheet.hours).label('hours'),
+            Project.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .join(WorkPackage, Task.work_package_id == WorkPackage.id)
         .join(Project, WorkPackage.project_id == Project.id)
         .filter(Timesheet.user_id == user_id)
-        .group_by(Project.id, Project.name)
+        .group_by(Project.id, Project.name, Project.budget_hours)
         .all()
     )
 
@@ -799,6 +808,7 @@ def report_user_projects(user_id):
             'project_id': row.project_id,
             'project': row.project,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]
@@ -810,16 +820,18 @@ def report_user_projects(user_id):
 @admin_required
 def report_user_project_work_packages(user_id, project_id):
     """Return hours for a user's project grouped by work package."""
+    # Provide budget data for each work package
     entries = (
         db.session.query(
             WorkPackage.id.label('work_package_id'),
             WorkPackage.name.label('work_package'),
             db.func.sum(Timesheet.hours).label('hours'),
+            WorkPackage.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .join(WorkPackage, Task.work_package_id == WorkPackage.id)
         .filter(Timesheet.user_id == user_id, WorkPackage.project_id == project_id)
-        .group_by(WorkPackage.id, WorkPackage.name)
+        .group_by(WorkPackage.id, WorkPackage.name, WorkPackage.budget_hours)
         .all()
     )
 
@@ -828,6 +840,7 @@ def report_user_project_work_packages(user_id, project_id):
             'work_package_id': row.work_package_id,
             'work_package': row.work_package,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]
@@ -839,14 +852,16 @@ def report_user_project_work_packages(user_id, project_id):
 @admin_required
 def report_user_work_package_tasks(user_id, work_package_id):
     """Return hours for a user's work package grouped by task."""
+    # Include each task's budget for progress calculations
     entries = (
         db.session.query(
             Task.name.label('task'),
             db.func.sum(Timesheet.hours).label('hours'),
+            Task.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .filter(Timesheet.user_id == user_id, Task.work_package_id == work_package_id)
-        .group_by(Task.name)
+        .group_by(Task.name, Task.budget_hours)
         .all()
     )
 
@@ -854,6 +869,7 @@ def report_user_work_package_tasks(user_id, work_package_id):
         {
             'task': row.task,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]
@@ -865,16 +881,18 @@ def report_user_work_package_tasks(user_id, work_package_id):
 @admin_required
 def report_project_work_packages(project_id):
     """Return hours for a project grouped by work package."""
+    # Expose work package budgets alongside logged hours
     entries = (
         db.session.query(
             WorkPackage.id.label('work_package_id'),
             WorkPackage.name.label('work_package'),
             db.func.sum(Timesheet.hours).label('hours'),
+            WorkPackage.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .join(WorkPackage, Task.work_package_id == WorkPackage.id)
         .filter(WorkPackage.project_id == project_id)
-        .group_by(WorkPackage.id, WorkPackage.name)
+        .group_by(WorkPackage.id, WorkPackage.name, WorkPackage.budget_hours)
         .all()
     )
 
@@ -883,6 +901,7 @@ def report_project_work_packages(project_id):
             'work_package_id': row.work_package_id,
             'work_package': row.work_package,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]
@@ -894,14 +913,16 @@ def report_project_work_packages(project_id):
 @admin_required
 def report_work_package_tasks(work_package_id):
     """Return hours for a work package grouped by task."""
+    # Each task row includes its allocated budget
     entries = (
         db.session.query(
             Task.name.label('task'),
             db.func.sum(Timesheet.hours).label('hours'),
+            Task.budget_hours.label('budget_hours'),
         )
         .join(Task, Timesheet.task_id == Task.id)
         .filter(Task.work_package_id == work_package_id)
-        .group_by(Task.name)
+        .group_by(Task.name, Task.budget_hours)
         .all()
     )
 
@@ -909,6 +930,7 @@ def report_work_package_tasks(work_package_id):
         {
             'task': row.task,
             'hours': row.hours or 0,
+            'budget_hours': row.budget_hours,
         }
         for row in entries
     ]

@@ -14,13 +14,14 @@
 <h3>Total Hours by User</h3>
 <table id="user-report">
     <thead>
-        <tr><th>User</th><th>Total Hours</th></tr>
+        <tr><th>User</th><th>Total Hours</th><th>Budget (hrs)</th></tr>
     </thead>
     <tbody>
     {% for uid, username, hours in user_hours %}
         <tr class="user-row" data-user-id="{{ uid }}">
             <td>{{ username }}</td>
             <td>{{ hours or 0 }}</td>
+            <td>N/A</td>
         </tr>
     {% endfor %}
     </tbody>
@@ -29,13 +30,14 @@
 <h3>Total Hours by Project</h3>
 <table id="project-report">
     <thead>
-        <tr><th>Project</th><th>Total Hours</th></tr>
+        <tr><th>Project</th><th>Total Hours</th><th>Budget (hrs)</th></tr>
     </thead>
     <tbody>
-    {% for pid, name, hours in project_hours %}
+    {% for pid, name, hours, budget in project_hours %}
         <tr class="project-row" data-project-id="{{ pid }}">
             <td>{{ name }}</td>
             <td>{{ hours or 0 }}</td>
+            <td>{{ budget or 'N/A' }}</td>
         </tr>
     {% endfor %}
     </tbody>
@@ -66,7 +68,7 @@ $(function(){
             let rows = '';
             data.forEach(function(item){
                 rows += '<tr class="detail-row user-project-row expandable level-1" data-user-id="' + userId + '" data-project-id="' + item.project_id + '">' +
-                        '<td>' + item.project + '</td><td>' + item.hours + '</td></tr>';
+                        '<td>' + item.project + '</td><td>' + item.hours + '</td><td>' + (item.budget_hours !== null ? item.budget_hours : 'N/A') + '</td></tr>';
             });
             tr.after(rows);
             tr.data('expanded', true);
@@ -88,7 +90,7 @@ $(function(){
             let rows = '';
             data.forEach(function(item){
                 rows += '<tr class="detail-row user-wp-row expandable level-2" data-user-id="' + userId + '" data-wp-id="' + item.work_package_id + '">' +
-                        '<td>' + item.work_package + '</td><td>' + item.hours + '</td></tr>';
+                        '<td>' + item.work_package + '</td><td>' + item.hours + '</td><td>' + (item.budget_hours !== null ? item.budget_hours : 'N/A') + '</td></tr>';
             });
             tr.after(rows);
             tr.data('expanded', true);
@@ -109,7 +111,7 @@ $(function(){
         $.getJSON('/admin_dashboard/reports/user/' + userId + '/work_package/' + wpId + '/tasks', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr class="detail-row level-3"><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
+                rows += '<tr class="detail-row level-3"><td>' + item.task + '</td><td>' + item.hours + '</td><td>' + (item.budget_hours !== null ? item.budget_hours : 'N/A') + '</td></tr>';
             });
             tr.after(rows);
             tr.data('expanded', true);
@@ -129,7 +131,7 @@ $(function(){
             let rows = '';
             data.forEach(function(item){
                 rows += '<tr class="detail-row project-wp-row expandable level-1" data-wp-id="' + item.work_package_id + '">' +
-                        '<td>' + item.work_package + '</td><td>' + item.hours + '</td></tr>';
+                        '<td>' + item.work_package + '</td><td>' + item.hours + '</td><td>' + (item.budget_hours !== null ? item.budget_hours : 'N/A') + '</td></tr>';
             });
             tr.after(rows);
             tr.data('expanded', true);
@@ -149,7 +151,7 @@ $(function(){
         $.getJSON('/admin_dashboard/reports/work_package/' + wpId + '/tasks', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr class="detail-row level-2"><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
+                rows += '<tr class="detail-row level-2"><td>' + item.task + '</td><td>' + item.hours + '</td><td>' + (item.budget_hours !== null ? item.budget_hours : 'N/A') + '</td></tr>';
             });
             tr.after(rows);
             tr.data('expanded', true);

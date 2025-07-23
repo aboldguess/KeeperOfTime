@@ -223,6 +223,69 @@ def init_dummy_data():
         db.session.bulk_save_objects(examples)
         db.session.commit()
 
+def init_example_projects():
+    """Populate the database with example projects, work packages and tasks."""
+    if Project.query.count() == 0:
+        sample_data = [
+            {
+                'name': 'Project Alpha',
+                'description': 'New website launch',
+                'packages': [
+                    {
+                        'name': 'Planning',
+                        'tasks': ['Requirements Gathering', 'Timeline Setup']
+                    },
+                    {
+                        'name': 'Implementation',
+                        'tasks': ['Frontend Development', 'Backend Integration']
+                    }
+                ]
+            },
+            {
+                'name': 'Project Beta',
+                'description': 'Mobile app development',
+                'packages': [
+                    {
+                        'name': 'Design',
+                        'tasks': ['UI Mockups', 'UX Flow']
+                    },
+                    {
+                        'name': 'Testing',
+                        'tasks': ['Unit Tests', 'User Acceptance']
+                    }
+                ]
+            },
+            {
+                'name': 'Project Gamma',
+                'description': 'Data analysis pipeline',
+                'packages': [
+                    {
+                        'name': 'Data Collection',
+                        'tasks': ['Gather Source Data', 'Clean Raw Data']
+                    },
+                    {
+                        'name': 'Modeling',
+                        'tasks': ['Build Models', 'Evaluate Results']
+                    }
+                ]
+            }
+        ]
+
+        for proj in sample_data:
+            project = Project(name=proj['name'], description=proj['description'])
+            db.session.add(project)
+            db.session.flush()  # Ensure project.id is available
+
+            for pkg in proj['packages']:
+                work_package = WorkPackage(name=pkg['name'], project_id=project.id)
+                db.session.add(work_package)
+                db.session.flush()
+                for task_name in pkg['tasks']:
+                    task = Task(name=task_name, work_package_id=work_package.id)
+                    db.session.add(task)
+
+        db.session.commit()
+
 # Helper function to calculate the leave days, accounting for half days.
 def calculate_leave_days(start_date, start_time, end_date, end_time):
     from datetime import timedelta
@@ -1089,6 +1152,9 @@ if __name__ == '__main__':
             admin_user = User(username='admin', password_hash=hashed_password, role='admin')
             db.session.add(admin_user)
             db.session.commit()
+
+        # Create example projects, work packages and tasks on first run
+        init_example_projects()
 
         # Populate dummy data so the UI has content immediately
         init_dummy_data()

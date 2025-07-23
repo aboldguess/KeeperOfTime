@@ -12,7 +12,7 @@ KeeperOfTime is a small Flask application used to track time on projects and man
 3. Run the application with `python3 timesheet_app.py`.
 
 The default SQLite database is stored in `instance/timesheet_app.db`. On first run an admin account is created with username `admin` and password `admin`.
-Some example "dummy" records are automatically added so you can explore the interface immediately. Administrators can manage these records from the **Dummy Data** page.
+Example projects with sample work packages and tasks are automatically added so you can explore the interface immediately. Administrators can manage these records from the **Dummy Data** page.
 
 ## Development
 

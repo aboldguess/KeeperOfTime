@@ -43,7 +43,9 @@
 
 <script>
 $(function(){
-    // Expand user rows to show project/work package/task breakdown
+    // Expand rows progressively to show user -> project -> work package -> task
+
+    // Fetch projects for a user
     $('#user-report').on('click', '.user-row', function(){
         const tr = $(this);
         const userId = tr.data('user-id');
@@ -52,19 +54,67 @@ $(function(){
             detail.toggle();
             return;
         }
-        $.getJSON('/admin_dashboard/reports/user/' + userId, function(data){
+
+        $.getJSON('/admin_dashboard/reports/user/' + userId + '/projects', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr><td>' + item.project + ' / ' + item.work_package + ' / ' + item.task +
-                        '</td><td>' + item.hours + '</td></tr>';
+                rows += '<tr class="user-project-row expandable" data-user-id="' + userId + '" data-project-id="' + item.project_id + '">' +
+                        '<td>' + item.project + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Project / WP / Task</th><th>Hours</th></tr></thead><tbody>' +
+            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Project</th><th>Hours</th></tr></thead><tbody>' +
                          rows + '</tbody></table></td></tr>';
             tr.after(html);
         });
     });
 
-    // Expand project rows to show work package/task breakdown
+    // Fetch work packages for a user's project
+    $('#user-report').on('click', '.user-project-row', function(e){
+        e.stopPropagation();
+        const tr = $(this);
+        const userId = tr.data('user-id');
+        const projectId = tr.data('project-id');
+        let detail = tr.next('.detail-row');
+        if(detail.length){
+            detail.toggle();
+            return;
+        }
+
+        $.getJSON('/admin_dashboard/reports/user/' + userId + '/project/' + projectId + '/work_packages', function(data){
+            let rows = '';
+            data.forEach(function(item){
+                rows += '<tr class="user-wp-row expandable" data-user-id="' + userId + '" data-wp-id="' + item.work_package_id + '">' +
+                        '<td>' + item.work_package + '</td><td>' + item.hours + '</td></tr>';
+            });
+            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Work Package</th><th>Hours</th></tr></thead><tbody>' +
+                         rows + '</tbody></table></td></tr>';
+            tr.after(html);
+        });
+    });
+
+    // Fetch tasks for a user's work package
+    $('#user-report').on('click', '.user-wp-row', function(e){
+        e.stopPropagation();
+        const tr = $(this);
+        const userId = tr.data('user-id');
+        const wpId = tr.data('wp-id');
+        let detail = tr.next('.detail-row');
+        if(detail.length){
+            detail.toggle();
+            return;
+        }
+
+        $.getJSON('/admin_dashboard/reports/user/' + userId + '/work_package/' + wpId + '/tasks', function(data){
+            let rows = '';
+            data.forEach(function(item){
+                rows += '<tr><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
+            });
+            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Task</th><th>Hours</th></tr></thead><tbody>' +
+                         rows + '</tbody></table></td></tr>';
+            tr.after(html);
+        });
+    });
+
+    // Project summary -> work packages
     $('#project-report').on('click', '.project-row', function(){
         const tr = $(this);
         const projectId = tr.data('project-id');
@@ -73,12 +123,36 @@ $(function(){
             detail.toggle();
             return;
         }
-        $.getJSON('/admin_dashboard/reports/project/' + projectId, function(data){
+
+        $.getJSON('/admin_dashboard/reports/project/' + projectId + '/work_packages', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr><td>' + item.work_package + ' / ' + item.task + '</td><td>' + item.hours + '</td></tr>';
+                rows += '<tr class="project-wp-row expandable" data-wp-id="' + item.work_package_id + '">' +
+                        '<td>' + item.work_package + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>WP / Task</th><th>Hours</th></tr></thead><tbody>' +
+            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Work Package</th><th>Hours</th></tr></thead><tbody>' +
+                         rows + '</tbody></table></td></tr>';
+            tr.after(html);
+        });
+    });
+
+    // Work package -> tasks (project centric)
+    $('#project-report').on('click', '.project-wp-row', function(e){
+        e.stopPropagation();
+        const tr = $(this);
+        const wpId = tr.data('wp-id');
+        let detail = tr.next('.detail-row');
+        if(detail.length){
+            detail.toggle();
+            return;
+        }
+
+        $.getJSON('/admin_dashboard/reports/work_package/' + wpId + '/tasks', function(data){
+            let rows = '';
+            data.forEach(function(item){
+                rows += '<tr><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
+            });
+            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Task</th><th>Hours</th></tr></thead><tbody>' +
                          rows + '</tbody></table></td></tr>';
             tr.after(html);
         });

@@ -306,3 +306,12 @@ table.nested {
     margin-top: 10px;
     width: 100%;
 }
+
+/* Rows that can be expanded in the reports */
+tr.expandable {
+    cursor: pointer;
+}
+
+tr.expandable:hover {
+    background-color: #f3f3f3;
+}

@@ -512,6 +512,153 @@ def report_project_detail(project_id):
 
     return jsonify(result)
 
+#
+# New hierarchical report endpoints
+# ---------------------------------
+# These endpoints supply JSON data for the drill-down reports. Each endpoint
+# aggregates timesheet hours at a specific level so the client can progressively
+# load more detail only when required.
+
+@app.route('/admin_dashboard/reports/user/<int:user_id>/projects')
+@admin_required
+def report_user_projects(user_id):
+    """Return hours for a user grouped by project."""
+    # Sum hours for each project this user has booked time on
+    entries = (
+        db.session.query(
+            Project.id.label('project_id'),
+            Project.name.label('project'),
+            db.func.sum(Timesheet.hours).label('hours'),
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .join(WorkPackage, Task.work_package_id == WorkPackage.id)
+        .join(Project, WorkPackage.project_id == Project.id)
+        .filter(Timesheet.user_id == user_id)
+        .group_by(Project.id, Project.name)
+        .all()
+    )
+
+    result = [
+        {
+            'project_id': row.project_id,
+            'project': row.project,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
+
+
+@app.route('/admin_dashboard/reports/user/<int:user_id>/project/<int:project_id>/work_packages')
+@admin_required
+def report_user_project_work_packages(user_id, project_id):
+    """Return hours for a user's project grouped by work package."""
+    entries = (
+        db.session.query(
+            WorkPackage.id.label('work_package_id'),
+            WorkPackage.name.label('work_package'),
+            db.func.sum(Timesheet.hours).label('hours'),
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .join(WorkPackage, Task.work_package_id == WorkPackage.id)
+        .filter(Timesheet.user_id == user_id, WorkPackage.project_id == project_id)
+        .group_by(WorkPackage.id, WorkPackage.name)
+        .all()
+    )
+
+    result = [
+        {
+            'work_package_id': row.work_package_id,
+            'work_package': row.work_package,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
+
+
+@app.route('/admin_dashboard/reports/user/<int:user_id>/work_package/<int:work_package_id>/tasks')
+@admin_required
+def report_user_work_package_tasks(user_id, work_package_id):
+    """Return hours for a user's work package grouped by task."""
+    entries = (
+        db.session.query(
+            Task.name.label('task'),
+            db.func.sum(Timesheet.hours).label('hours'),
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .filter(Timesheet.user_id == user_id, Task.work_package_id == work_package_id)
+        .group_by(Task.name)
+        .all()
+    )
+
+    result = [
+        {
+            'task': row.task,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
+
+
+@app.route('/admin_dashboard/reports/project/<int:project_id>/work_packages')
+@admin_required
+def report_project_work_packages(project_id):
+    """Return hours for a project grouped by work package."""
+    entries = (
+        db.session.query(
+            WorkPackage.id.label('work_package_id'),
+            WorkPackage.name.label('work_package'),
+            db.func.sum(Timesheet.hours).label('hours'),
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .join(WorkPackage, Task.work_package_id == WorkPackage.id)
+        .filter(WorkPackage.project_id == project_id)
+        .group_by(WorkPackage.id, WorkPackage.name)
+        .all()
+    )
+
+    result = [
+        {
+            'work_package_id': row.work_package_id,
+            'work_package': row.work_package,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
+
+
+@app.route('/admin_dashboard/reports/work_package/<int:work_package_id>/tasks')
+@admin_required
+def report_work_package_tasks(work_package_id):
+    """Return hours for a work package grouped by task."""
+    entries = (
+        db.session.query(
+            Task.name.label('task'),
+            db.func.sum(Timesheet.hours).label('hours'),
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .filter(Task.work_package_id == work_package_id)
+        .group_by(Task.name)
+        .all()
+    )
+
+    result = [
+        {
+            'task': row.task,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
+
 @app.route('/admin_dashboard/projects', methods=['GET', 'POST'])
 @admin_required
 def projects_page():

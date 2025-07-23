@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>The Keeper Of Time - Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -14,6 +14,14 @@
         <div class="content">
             <h2>Welcome, {{ current_user.username }}!</h2>
             <p>Select an option from the sidebar to get started.</p>
+
+            <h3>Statistics</h3>
+            <ul>
+                <li>Total Users: {{ user_count }}</li>
+                <li>Total Projects: {{ project_count }}</li>
+                <li>Total Hours Logged: {{ total_hours }}</li>
+                <li>Pending Leave Requests: {{ pending_leave_count }}</li>
+            </ul>
         </div>
     </div>
 </body>

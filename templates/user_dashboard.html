@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Dashboard</title>
+    <title>The Keeper Of Time - User Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -14,6 +14,13 @@
         <div class="content">
             <h2>Welcome, {{ current_user.username }}!</h2>
             <p>Select an option from the sidebar to get started.</p>
+
+            <h3>Your Statistics for {{ month_year }}</h3>
+            <ul>
+                <li>Hours logged this month: {{ total_hours_month }}</li>
+                <li>Remaining Leave Balance: {{ remaining_leave }}</li>
+                <li>Upcoming Approved Leave Requests: {{ upcoming_leave }}</li>
+            </ul>
         </div>
     </div>
 </body>

@@ -15,6 +15,7 @@
         <tr>
             <th>Project Name</th>
             <th>Description</th>
+            <th>Budget (hrs)</th>
             <th>Total Hours</th>
             <th>Users</th>
             <th>Details</th>
@@ -25,6 +26,7 @@
         <tr>
             <td>{{ item.project.name }}</td>
             <td>{{ item.project.description }}</td>
+            <td>{{ item.project.budget_hours or 'N/A' }}</td>
             <td>{{ item.total_hours }}</td>
             <td>{{ item.users | join(', ') }}</td>
             <td><a href="{{ url_for('project_detail', project_id=item.project.id) }}">View Details</a></td>
@@ -35,6 +37,7 @@
             <form method="POST" action="{{ url_for('projects_page') }}">
                 <td><input type="text" name="project_name" placeholder="New Project Name" required></td>
                 <td><input type="text" name="project_description" placeholder="Description" required></td>
+                <td><input type="number" step="0.1" name="budget_hours" placeholder="Hours"></td>
                 <td colspan="2"></td>
                 <td><button type="submit">Add Project</button></td>
             </form>

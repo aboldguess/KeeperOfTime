@@ -1,0 +1,302 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #FFFFFF; /* Text color set to White */
+    background-color: #667176; /* Background color set to Grey */
+}
+
+header {
+    background-color: #064b6a; /* Blue */
+    color: #FFFFFF; /* White */
+    padding: 15px;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #187979; /* Teal */
+    min-height: 100vh;
+    padding-top: 20px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.sidebar li {
+    padding: 10px 20px;
+}
+
+.sidebar a {
+    color: #FFFFFF; /* White */
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar a:hover {
+    background-color: #064b6a; /* Blue */
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #FFFFFF; /* White background for content */
+    color: #000000; /* Black text for better readability on white */
+}
+
+.breadcrumb {
+    margin-bottom: 20px;
+}
+
+.breadcrumb a {
+    color: #ff8f48; /* Orange */
+    text-decoration: none;
+    margin-right: 5px;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb span {
+    margin-right: 5px;
+    color: #187979; /* Teal */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    color: #000000; /* Black text in tables */
+}
+
+table, th, td {
+    border: 1px solid #667176; /* Grey */
+}
+
+th {
+    background-color: #ff9f38; /* Light Orange */
+    color: #FFFFFF; /* White */
+}
+
+td {
+    background-color: #FFFFFF; /* White */
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+.flash-message-container {
+    margin-top: 20px;
+}
+
+.flash-message {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    color: #FFFFFF; /* White text for flash messages */
+}
+
+.flash-message.success {
+    background-color: #70AD47; /* Light Green */
+}
+
+.flash-message.danger {
+    background-color: #ff8f48; /* Orange */
+}
+
+.back-button {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    background-color: #ff8f48; /* Orange */
+    color: #FFFFFF; /* White */
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.back-button:hover {
+    background-color: #ff9f38; /* Light Orange */
+}
+
+button {
+    padding: 8px 12px;
+    background-color: #ff8f48; /* Orange */
+    color: #FFFFFF; /* White */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ff9f38; /* Light Orange */
+}
+
+input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #667176; /* Grey */
+    border-radius: 4px;
+    background-color: #FFFFFF; /* White */
+    color: #000000; /* Black text */
+}
+
+input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder {
+    color: #667176; /* Grey placeholder text */
+}
+
+nav.breadcrumb {
+    font-size: 14px;
+}
+
+nav.breadcrumb a {
+    color: #ff8f48; /* Orange */
+}
+
+nav.breadcrumb span {
+    color: #187979; /* Teal */
+}
+
+a {
+    color: #ff8f48; /* Orange */
+}
+
+a:hover {
+    color: #ff9f38; /* Light Orange */
+}
+
+.footer {
+    background-color: #064b6a; /* Blue */
+    color: #FFFFFF; /* White */
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+/* Styles for the separate add user form */
+.add-user-password {
+    margin-top: 20px;
+}
+
+.add-user-password form {
+    background-color: #FFFFFF; /* White background */
+    padding: 20px;
+    border: 1px solid #667176; /* Grey border */
+    border-radius: 5px;
+}
+
+.add-user-password label {
+    display: block;
+    margin-bottom: 5px;
+    color: #000000; /* Black text */
+}
+
+.add-user-password input[type="text"],
+.add-user-password input[type="password"],
+.add-user-password select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #667176; /* Grey border */
+    border-radius: 4px;
+    background-color: #FFFFFF; /* White background */
+    color: #000000; /* Black text */
+}
+
+.add-user-password button {
+    padding: 8px 12px;
+    background-color: #ff8f48; /* Orange */
+    color: #FFFFFF; /* White */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-user-password button:hover {
+    background-color: #ff9f38; /* Light Orange */
+}
+
+/* Adjust action buttons in the users table */
+table td form {
+    display: inline;
+    margin-right: 5px;
+}
+
+table td input[type="password"] {
+    width: auto;
+    padding: 5px;
+    margin-right: 5px;
+    border: 1px solid #667176; /* Grey */
+    border-radius: 4px;
+}
+
+table td button {
+    padding: 5px 10px;
+    background-color: #ff8f48; /* Orange */
+    color: #FFFFFF; /* White */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+table td button:hover {
+    background-color: #ff9f38; /* Light Orange */
+}
+
+/* Styles for buttons */
+.button {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #ff8f48; /* Orange */
+    color: #FFFFFF; /* White */
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.button:hover {
+    background-color: #ff9f38; /* Light Orange */
+}
+
+/* Styles for forms in leave requests */
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #000000; /* Black */
+}
+
+form input[type="text"],
+form input[type="date"],
+form input[type="number"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #667176; /* Grey */
+    border-radius: 4px;
+    background-color: #FFFFFF; /* White */
+    color: #000000; /* Black */
+}
+
+/* Calendar styles */
+#calendar {
+    max-width: 900px;
+    margin: 0 auto;
+}

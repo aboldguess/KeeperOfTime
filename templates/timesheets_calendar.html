@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timesheets Calendar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        Timesheets Calendar
+    </header>
+    <div class="container">
+        {% include 'sidebar.html' %}
+        <div class="content">
+            <h2>Timesheets Calendar</h2>
+
+            <div class="calendar-navigation">
+                <a href="{{ url_for('timesheets_page', year=prev_year, month=prev_month) }}">&laquo; Previous</a>
+                <span>{{ current_year }} - {{ current_month }}</span>
+                <a href="{{ url_for('timesheets_page', year=next_year, month=next_month) }}">Next &raquo;</a>
+            </div>
+
+            <div class="calendar-container">
+                {{ calendar_html | safe }}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

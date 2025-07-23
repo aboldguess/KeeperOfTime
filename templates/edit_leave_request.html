@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Leave Request{% endblock %}
+
+{% block content %}
+<h2>Edit Leave Request</h2>
+
+<p>Please update the details of your leave request. The 'First time of absence' indicates when your leave starts, and the 'Last time of absence' indicates when your leave ends.</p>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.start_date.label }} {{ form.start_date() }}<br>
+    {{ form.start_time.label }}<br>
+    {{ form.start_time() }}<br><br>
+    {{ form.end_date.label }} {{ form.end_date() }}<br>
+    {{ form.end_time.label }}<br>
+    {{ form.end_time() }}<br><br>
+    {{ form.leave_type.label }} {{ form.leave_type() }}<br>
+    {{ form.comment.label }} {{ form.comment() }}<br>
+    {{ form.submit(class="button") }}
+</form>
+
+{% endblock %}
+
+<style>
+.leave-form {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.leave-form-section {
+    width: 45%;
+}
+.button {
+    padding: 5px 10px;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #28a745;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+</style>

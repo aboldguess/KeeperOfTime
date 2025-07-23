@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Users Management{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a> /
+    <span>Users</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Users Management</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>********</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.status.capitalize() }}</td>
+            <td>
+                {% if user.username != 'admin' %}
+                    {% if user.status != 'archived' %}
+                    <!-- Change Password Form -->
+                    <form method="POST" action="{{ url_for('users_page') }}" style="display:inline;">
+                        <input type="hidden" name="action" value="change_password">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <input type="password" name="new_password" placeholder="New Password" required>
+                        <button type="submit">Change Password</button>
+                    </form>
+                    <!-- Archive User Form -->
+                    <form method="POST" action="{{ url_for('users_page') }}" style="display:inline;">
+                        <input type="hidden" name="action" value="archive_user">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit">Archive</button>
+                    </form>
+                    {% else %}
+                    <!-- Activate User Form -->
+                    <form method="POST" action="{{ url_for('users_page') }}" style="display:inline;">
+                        <input type="hidden" name="action" value="activate_user">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit">Activate</button>
+                    </form>
+                    {% endif %}
+                {% else %}
+                    <!-- Admin User - No Actions -->
+                    <em>No actions available</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        <!-- Inline Entry Form to Add New User -->
+        <tr>
+            <form method="POST" action="{{ url_for('users_page') }}">
+                <input type="hidden" name="action" value="add_user">
+                <td>
+                    <input type="text" name="username" placeholder="Username" required>
+                </td>
+                <td>
+                    <input type="password" name="password" placeholder="Password" required>
+                </td>
+                <td>
+                    <select name="role" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </td>
+                <td>
+                    Active
+                </td>
+                <td>
+                    <button type="submit">Add User</button>
+                </td>
+            </form>
+        </tr>
+    </tbody>
+</table>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+{% endblock %}

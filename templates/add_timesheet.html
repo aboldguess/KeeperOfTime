@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Timesheet</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        Add New Timesheet
+    </header>
+    <div class="container">
+        {% include 'sidebar.html' %}
+        <div class="content">
+            <h2>Add Timesheet</h2>
+            <form method="POST" action="{{ url_for('timesheets_page') }}">
+                <label for="task">Task:</label>
+                <input type="text" name="task" id="task" required>
+                
+                <label for="week_ending">Week Ending:</label>
+                <input type="date" name="week_ending" id="week_ending" required>
+                
+                <label for="hours">Hours:</label>
+                <input type="number" name="hours" id="hours" required>
+                
+                <label for="description">Description:</label>
+                <textarea name="description" id="description" required></textarea>
+                
+                <button type="submit">Submit Timesheet</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-message-container">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</body>
+</html>

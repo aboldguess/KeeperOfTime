@@ -1,0 +1,21 @@
+<ul>
+    {% if current_user.is_authenticated %}
+        {% if current_user.role == 'admin' %}
+            <!-- Admin Sidebar Links -->
+            <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+            <li><a href="{{ url_for('projects_page') }}">Projects</a></li>
+            <li><a href="{{ url_for('users_page') }}">Users</a></li>
+            <li><a href="{{ url_for('manage_leave_requests') }}">Manage Leave Requests</a></li>
+            <li><a href="{{ url_for('adjust_leave_balances') }}">Adjust Leave Balances</a></li>
+            <li><a href="{{ url_for('leave_calendar') }}">Leave Calendar</a></li>
+        {% else %}
+            <!-- User Sidebar Links -->
+            <li><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('timesheets_page') }}">Timesheets</a></li>
+            <li><a href="{{ url_for('user_leave_dashboard') }}">Annual Leave</a></li>
+        {% endif %}
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    {% else %}
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+    {% endif %}
+</ul>

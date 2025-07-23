@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Calendar{% endblock %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <!-- Include FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a> /
+    <span>Leave Calendar</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Leave Calendar</h2>
+
+<div id="calendar"></div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <!-- Include FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var events = {{ events | tojson | safe }};
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: events,
+                navLinks: true,
+                editable: false,
+                selectable: false
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}

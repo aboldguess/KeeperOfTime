@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Leave Request{% endblock %}
+
+{% block content %}
+<h2>Submit Leave Request</h2>
+
+<p>Please select the dates and times of your leave. The 'First time of absence' indicates when your leave starts, and the 'Last time of absence' indicates when your leave ends.</p>
+
+<form method="POST">
+    <div class="leave-form">
+        <div class="leave-form-section">
+            <h3>From</h3>
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" required>
+
+            <label>First Time of Absence:</label><br>
+            <input type="radio" name="start_time" value="Morning" checked> Morning<br>
+            <input type="radio" name="start_time" value="Afternoon"> Afternoon
+        </div>
+
+        <div class="leave-form-section">
+            <h3>To</h3>
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" required>
+
+            <label>Last Time of Absence:</label><br>
+            <input type="radio" name="end_time" value="Morning"> Morning<br>
+            <input type="radio" name="end_time" value="Afternoon" checked> Afternoon
+        </div>
+    </div>
+
+    <label for="leave_type">Leave Type:</label>
+    <select name="leave_type" required>
+        <option value="Annual Leave">Annual Leave</option>
+        <option value="Sick Leave">Sick Leave</option>
+        <!-- Add other leave types as needed -->
+    </select>
+
+    <label for="comment">Comment:</label>
+    <textarea name="comment" rows="4" cols="50"></textarea>
+
+    <input type="submit" value="Submit Request">
+</form>
+{% endblock %}
+
+<style>
+.leave-form {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.leave-form-section {
+    width: 45%;
+}
+</style>

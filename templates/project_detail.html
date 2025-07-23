@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Details{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('projects_page') }}">Projects</a> /
+    <span>{{ project.name }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Work Packages for {{ project.name }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Work Package Name</th>
+            <th>Total Hours</th>
+            <th>Users</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in wp_data %}
+        <tr>
+            <td>{{ item.work_package.name }}</td>
+            <td>{{ item.total_hours }}</td>
+            <td>{{ item.users | join(', ') }}</td>
+            <td><a href="{{ url_for('work_package_detail', work_package_id=item.work_package.id) }}">View Details</a></td>
+        </tr>
+        {% endfor %}
+        <!-- Inline Entry Form -->
+        <tr>
+            <form method="POST" action="{{ url_for('project_detail', project_id=project.id) }}">
+                <td><input type="text" name="work_package_name" placeholder="New Work Package Name" required></td>
+                <td colspan="2"></td>
+                <td><button type="submit">Add Work Package</button></td>
+            </form>
+        </tr>
+    </tbody>
+</table>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+{% endblock %}

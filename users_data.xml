@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<users>
+  <user>
+    <username>admin</username>
+    <password>admin</password>
+    <role>admin</role>
+    <status>active</status>
+    </user>
+  <user>
+    <username>asdfg</username>
+    <password>asdfghjkl</password>
+    <role>admin</role>
+    <status>active</status>
+    </user>
+  <user>
+    <username>qwerty</username>
+    <password>qwertyuiop</password>
+    <role>user</role>
+    <status>active</status>
+    </user>
+  </users>

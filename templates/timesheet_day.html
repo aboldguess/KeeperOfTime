@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Timesheet for {{ date }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('user_dashboard') }}">Dashboard</a> /
+    <a href="{{ url_for('timesheets_page') }}">Timesheets</a> /
+    <span>{{ date }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Timesheet Entries for {{ date }}</h2>
+{% if timesheets %}
+<table>
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Work Package</th>
+            <th>Task</th>
+            <th>Hours</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for timesheet in timesheets %}
+        <tr>
+            <td>{{ timesheet.task.work_package.project.name }}</td>
+            <td>{{ timesheet.task.work_package.name }}</td>
+            <td>{{ timesheet.task.name }}</td>
+            <td>{{ timesheet.hours }}</td>
+            <td>{{ timesheet.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>No timesheet entries for this date.</p>
+{% endif %}
+
+<h3>Add New Entry</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Work Package</th>
+            <th>Task</th>
+            <th>Hours</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <form method="POST" action="{{ url_for('timesheet_for_day', date_str=date) }}">
+                <td>
+                    <select name="project" id="project" required>
+                        <option value="">Select Project</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select name="work_package" id="work_package" required>
+                        <option value="">Select Work Package</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="task_id" id="task" required>
+                        <option value="">Select Task</option>
+                    </select>
+                </td>
+                <td><input type="number" step="0.01" name="hours" id="hours" required></td>
+                <td><textarea name="description" id="description" required></textarea></td>
+                <td><button type="submit">Add Entry</button></td>
+            </form>
+        </tr>
+    </tbody>
+</table>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<script>
+    $(document).ready(function(){
+        // Base URLs for AJAX calls
+        var getWorkPackagesUrl = '{{ url_for("get_work_packages", project_id=0) }}';
+        var getTasksUrl = '{{ url_for("get_tasks", work_package_id=0) }}';
+
+        // Load work packages when a project is selected
+        $('#project').change(function(){
+            var projectId = $(this).val();
+            $('#work_package').empty().append('<option value="">Select Work Package</option>');
+            $('#task').empty().append('<option value="">Select Task</option>');
+            if(projectId){
+                $.ajax({
+                    url: getWorkPackagesUrl.replace('0', projectId),
+                    type: 'GET',
+                    success: function(data){
+                        $.each(data, function(index, wp){
+                            $('#work_package').append('<option value="' + wp.id + '">' + wp.name + '</option>');
+                        });
+                    }
+                });
+            }
+        });
+
+        // Load tasks when a work package is selected
+        $('#work_package').change(function(){
+            var workPackageId = $(this).val();
+            $('#task').empty().append('<option value="">Select Task</option>');
+            if(workPackageId){
+                $.ajax({
+                    url: getTasksUrl.replace('0', workPackageId),
+                    type: 'GET',
+                    success: function(data){
+                        $.each(data, function(index, task){
+                            $('#task').append('<option value="' + task.id + '">' + task.name + '</option>');
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <span>Projects</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Projects</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Description</th>
+            <th>Total Hours</th>
+            <th>Users</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in project_data %}
+        <tr>
+            <td>{{ item.project.name }}</td>
+            <td>{{ item.project.description }}</td>
+            <td>{{ item.total_hours }}</td>
+            <td>{{ item.users | join(', ') }}</td>
+            <td><a href="{{ url_for('project_detail', project_id=item.project.id) }}">View Details</a></td>
+        </tr>
+        {% endfor %}
+        <!-- Inline Entry Form -->
+        <tr>
+            <form method="POST" action="{{ url_for('projects_page') }}">
+                <td><input type="text" name="project_name" placeholder="New Project Name" required></td>
+                <td><input type="text" name="project_description" placeholder="Description" required></td>
+                <td colspan="2"></td>
+                <td><button type="submit">Add Project</button></td>
+            </form>
+        </tr>
+    </tbody>
+</table>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+{% endblock %}

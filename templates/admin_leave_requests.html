@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Leave Requests{% endblock %}
+
+{% block content %}
+<h2>Manage Leave Requests</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Dates</th>
+            <th>Duration</th>
+            <th>Type</th>
+            <th>Comment</th>
+            <th>Status</th>
+            <th>Admin Comment</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for leave in leave_requests %}
+        <tr>
+            <td>{{ leave.id }}</td>
+            <td>{{ leave.user.username }}</td>
+            <td>
+                {{ leave.start_date }} ({{ leave.get_start_time_display() }})
+                to {{ leave.end_date }} ({{ leave.get_end_time_display() }})
+            </td>
+            <td>{{ leave.calculate_duration() }} days</td>
+            <td>{{ leave.leave_type }}</td>
+            <td>{{ leave.comment or 'N/A' }}</td>
+            <td>{{ leave.status }}</td>
+            <td>{{ leave.admin_comment or 'N/A' }}</td>
+            <td>
+                {% if leave.status == 'Pending' %}
+                <form method="POST">
+                    <input type="hidden" name="leave_request_id" value="{{ leave.id }}">
+                    <textarea name="admin_comment" placeholder="Admin comment (optional)"></textarea><br>
+                    <button type="submit" name="action" value="approve">Approve</button>
+                    <button type="submit" name="action" value="reject">Reject</button>
+                </form>
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        Admin Dashboard
+    </header>
+    <div class="container">
+        {% include 'sidebar.html' %}
+        <div class="content">
+            <h2>Welcome, {{ current_user.username }}!</h2>
+            <p>Select an option from the sidebar to get started.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Annual Leave{% endblock %}
+
+{% block content %}
+<h2>Annual Leave</h2>
+
+<h3>Leave Balance</h3>
+<p>Total Leave: {{ leave_balance.total_leave }} days</p>
+<p>Used Leave: {{ leave_balance.used_leave }} days</p>
+<p>Remaining Leave: {{ leave_balance.total_leave - leave_balance.used_leave }} days</p>
+
+<a href="{{ url_for('submit_leave_request') }}" class="button">Submit Leave Request</a>
+
+<h3>Your Leave Requests</h3>
+{% if leave_requests %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dates</th>
+            <th>Duration</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Admin Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for leave in leave_requests %}
+        <tr>
+            <td>{{ leave.id }}</td>
+            <td>
+                {{ leave.start_date }} ({{ leave.get_start_time_display() }})
+                to {{ leave.end_date }} ({{ leave.get_end_time_display() }})
+            </td>
+            <td>{{ leave.calculate_duration() }} days</td>
+            <td>{{ leave.leave_type }}</td>
+            <td>{{ leave.status }}</td>
+            <td>{{ leave.admin_comment or 'N/A' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You have no leave requests.</p>
+{% endif %}
+{% endblock %}

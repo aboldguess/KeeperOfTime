@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Timesheet App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Include jQuery for AJAX calls -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Timesheet Application</h1>
+    </header>
+    <div class="container">
+        {% include 'sidebar.html' %}
+        <div class="content">
+            <!-- Breadcrumb Navigation -->
+            {% block breadcrumb %}
+            <!-- Example:
+            <nav class="breadcrumb">
+                <a href="{{ url_for('projects_page') }}">Projects</a> /
+                <a href="{{ url_for('project_detail', project_id=1) }}">Work Packages</a> /
+                <span>Tasks</span>
+            </nav>
+            -->
+            {% endblock %}
+            
+            <!-- Main Content -->
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

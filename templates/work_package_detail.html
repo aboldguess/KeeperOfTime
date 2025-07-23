@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Work Package Details{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('projects_page') }}">Projects</a> /
+    <a href="{{ url_for('project_detail', project_id=work_package.project_id) }}">Work Packages</a> /
+    <span>{{ work_package.name }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Tasks for {{ work_package.name }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Task Name</th>
+            <th>Total Hours</th>
+            <th>Users</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in task_data %}
+        <tr>
+            <td>{{ item.task.name }}</td>
+            <td>{{ item.total_hours }}</td>
+            <td>{{ item.users | join(', ') }}</td>
+            <td>
+                <a href="{{ url_for('task_detail', task_id=item.task.id) }}">View Details</a>
+            </td>
+        </tr>
+        {% endfor %}
+        <!-- Inline Entry Form -->
+        <tr>
+            <form method="POST" action="{{ url_for('work_package_detail', work_package_id=work_package.id) }}">
+                <td><input type="text" name="task_name" placeholder="New Task Name" required></td>
+                <td colspan="2"></td>
+                <td><button type="submit">Add Task</button></td>
+            </form>
+        </tr>
+    </tbody>
+</table>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+{% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Timesheets</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        View Timesheets
+    </header>
+    <div class="container">
+        {% include 'sidebar.html' %}
+        <div class="content">
+            <h2>Previous Timesheets</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Task</th>
+                        <th>Week Ending</th>
+                        <th>Hours</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for timesheet in timesheets %}
+                    <tr>
+                        <td>{{ timesheet['timestamp'] }}</td>
+                        <td>{{ timesheet['user'] }}</td>
+                        <td>{{ timesheet['task'] }}</td>
+                        <td>{{ timesheet['week_ending'] }}</td>
+                        <td>{{ timesheet['hours'] }}</td>
+                        <td>{{ timesheet['description'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

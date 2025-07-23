@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}User Task Entries{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('projects_page') }}">Projects</a> /
+    <a href="{{ url_for('project_detail', project_id=task.work_package.project_id) }}">Work Packages</a> /
+    <a href="{{ url_for('work_package_detail', work_package_id=task.work_package_id) }}">Tasks</a> /
+    <a href="{{ url_for('task_detail', task_id=task.id) }}">Bookings</a> /
+    <span>{{ user.username }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Timesheet Entries for {{ user.username }} on Task: {{ task.name }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Hours</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in timesheet_entries %}
+        <tr>
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.hours }}</td>
+            <td>{{ entry.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

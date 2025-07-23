@@ -301,12 +301,6 @@ form textarea {
     margin: 0 auto;
 }
 
-/* Styles for nested tables used in expandable reports */
-table.nested {
-    margin-top: 10px;
-    width: 100%;
-}
-
 /* Rows that can be expanded in the reports */
 tr.expandable {
     cursor: pointer;
@@ -315,3 +309,13 @@ tr.expandable {
 tr.expandable:hover {
     background-color: #f3f3f3;
 }
+
+/* Visual hierarchy for detail rows in reports */
+tr.detail-row {
+    background-color: #f9f9f9;
+}
+
+/* Indentation levels for expanded rows */
+tr.level-1 td { padding-left: 20px; }
+tr.level-2 td { padding-left: 40px; }
+tr.level-3 td { padding-left: 60px; }

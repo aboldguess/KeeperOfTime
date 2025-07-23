@@ -43,27 +43,33 @@
 
 <script>
 $(function(){
-    // Expand rows progressively to show user -> project -> work package -> task
+    // Utility to remove all following detail rows when collapsing
+    function removeDetailRows(row) {
+        let next = row.next();
+        while (next.length && next.hasClass('detail-row')) {
+            next.remove();
+            next = row.next();
+        }
+        row.data('expanded', false);
+    }
 
-    // Fetch projects for a user
+    // Fetch projects for a user and insert them as new rows
     $('#user-report').on('click', '.user-row', function(){
         const tr = $(this);
         const userId = tr.data('user-id');
-        let detail = tr.next('.detail-row');
-        if(detail.length){
-            detail.toggle();
+        if(tr.data('expanded')){
+            removeDetailRows(tr);
             return;
         }
 
         $.getJSON('/admin_dashboard/reports/user/' + userId + '/projects', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr class="user-project-row expandable" data-user-id="' + userId + '" data-project-id="' + item.project_id + '">' +
+                rows += '<tr class="detail-row user-project-row expandable level-1" data-user-id="' + userId + '" data-project-id="' + item.project_id + '">' +
                         '<td>' + item.project + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Project</th><th>Hours</th></tr></thead><tbody>' +
-                         rows + '</tbody></table></td></tr>';
-            tr.after(html);
+            tr.after(rows);
+            tr.data('expanded', true);
         });
     });
 
@@ -73,21 +79,19 @@ $(function(){
         const tr = $(this);
         const userId = tr.data('user-id');
         const projectId = tr.data('project-id');
-        let detail = tr.next('.detail-row');
-        if(detail.length){
-            detail.toggle();
+        if(tr.data('expanded')){
+            removeDetailRows(tr);
             return;
         }
 
         $.getJSON('/admin_dashboard/reports/user/' + userId + '/project/' + projectId + '/work_packages', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr class="user-wp-row expandable" data-user-id="' + userId + '" data-wp-id="' + item.work_package_id + '">' +
+                rows += '<tr class="detail-row user-wp-row expandable level-2" data-user-id="' + userId + '" data-wp-id="' + item.work_package_id + '">' +
                         '<td>' + item.work_package + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Work Package</th><th>Hours</th></tr></thead><tbody>' +
-                         rows + '</tbody></table></td></tr>';
-            tr.after(html);
+            tr.after(rows);
+            tr.data('expanded', true);
         });
     });
 
@@ -97,20 +101,18 @@ $(function(){
         const tr = $(this);
         const userId = tr.data('user-id');
         const wpId = tr.data('wp-id');
-        let detail = tr.next('.detail-row');
-        if(detail.length){
-            detail.toggle();
+        if(tr.data('expanded')){
+            removeDetailRows(tr);
             return;
         }
 
         $.getJSON('/admin_dashboard/reports/user/' + userId + '/work_package/' + wpId + '/tasks', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
+                rows += '<tr class="detail-row level-3"><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Task</th><th>Hours</th></tr></thead><tbody>' +
-                         rows + '</tbody></table></td></tr>';
-            tr.after(html);
+            tr.after(rows);
+            tr.data('expanded', true);
         });
     });
 
@@ -118,21 +120,19 @@ $(function(){
     $('#project-report').on('click', '.project-row', function(){
         const tr = $(this);
         const projectId = tr.data('project-id');
-        let detail = tr.next('.detail-row');
-        if(detail.length){
-            detail.toggle();
+        if(tr.data('expanded')){
+            removeDetailRows(tr);
             return;
         }
 
         $.getJSON('/admin_dashboard/reports/project/' + projectId + '/work_packages', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr class="project-wp-row expandable" data-wp-id="' + item.work_package_id + '">' +
+                rows += '<tr class="detail-row project-wp-row expandable level-1" data-wp-id="' + item.work_package_id + '">' +
                         '<td>' + item.work_package + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Work Package</th><th>Hours</th></tr></thead><tbody>' +
-                         rows + '</tbody></table></td></tr>';
-            tr.after(html);
+            tr.after(rows);
+            tr.data('expanded', true);
         });
     });
 
@@ -141,20 +141,18 @@ $(function(){
         e.stopPropagation();
         const tr = $(this);
         const wpId = tr.data('wp-id');
-        let detail = tr.next('.detail-row');
-        if(detail.length){
-            detail.toggle();
+        if(tr.data('expanded')){
+            removeDetailRows(tr);
             return;
         }
 
         $.getJSON('/admin_dashboard/reports/work_package/' + wpId + '/tasks', function(data){
             let rows = '';
             data.forEach(function(item){
-                rows += '<tr><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
+                rows += '<tr class="detail-row level-2"><td>' + item.task + '</td><td>' + item.hours + '</td></tr>';
             });
-            const html = '<tr class="detail-row"><td colspan="2"><table class="nested"><thead><tr><th>Task</th><th>Hours</th></tr></thead><tbody>' +
-                         rows + '</tbody></table></td></tr>';
-            tr.after(html);
+            tr.after(rows);
+            tr.data('expanded', true);
         });
     });
 });

@@ -134,6 +134,12 @@ class LeaveBalance(db.Model):
     total_leave = db.Column(db.Float, nullable=False, default=20.0)  # Default annual leave entitlement
     used_leave = db.Column(db.Float, nullable=False, default=0.0)
 
+class DummyData(db.Model):
+    """Simple table containing dummy records used for testing."""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    value = db.Column(db.Text, nullable=True)
+
 ##################################################
 # Helper functions                               #
 ##################################################
@@ -205,6 +211,17 @@ def admin_required(f):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
+
+def init_dummy_data():
+    """Create a few dummy records for testing if table is empty."""
+    if DummyData.query.count() == 0:
+        examples = [
+            DummyData(name='Example 1', value='First dummy value'),
+            DummyData(name='Example 2', value='Second dummy value'),
+            DummyData(name='Example 3', value='Third dummy value'),
+        ]
+        db.session.bulk_save_objects(examples)
+        db.session.commit()
 
 # Helper function to calculate the leave days, accounting for half days.
 def calculate_leave_days(start_date, start_time, end_date, end_time):
@@ -1022,6 +1039,39 @@ def leave_calendar():
 
     return render_template('leave_calendar.html', events=events)
 
+@app.route('/admin_dashboard/dummy_data', methods=['GET', 'POST'])
+@admin_required
+def dummy_data_page():
+    """Allow administrators to manage dummy data records."""
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'add':
+            # Create a new dummy record
+            name = request.form['name']
+            value = request.form.get('value')
+            db.session.add(DummyData(name=name, value=value))
+            db.session.commit()
+            flash(f'Dummy data "{name}" added.', 'success')
+        elif action == 'update':
+            # Update an existing dummy record
+            dummy_id = int(request.form['dummy_id'])
+            dummy = DummyData.query.get_or_404(dummy_id)
+            dummy.name = request.form['name']
+            dummy.value = request.form.get('value')
+            db.session.commit()
+            flash('Dummy data updated.', 'success')
+        elif action == 'delete':
+            # Remove an existing dummy record
+            dummy_id = int(request.form['dummy_id'])
+            dummy = DummyData.query.get_or_404(dummy_id)
+            db.session.delete(dummy)
+            db.session.commit()
+            flash('Dummy data deleted.', 'success')
+
+    # Fetch all dummy records for display
+    dummies = DummyData.query.all()
+    return render_template('dummy_data.html', dummies=dummies)
+
 # Initialize the database and create admin user
 
 #if __name__ == '__main__':
@@ -1039,6 +1089,9 @@ if __name__ == '__main__':
             admin_user = User(username='admin', password_hash=hashed_password, role='admin')
             db.session.add(admin_user)
             db.session.commit()
+
+        # Populate dummy data so the UI has content immediately
+        init_dummy_data()
 
     #app.run(debug=True)
     #app.run(host='0.0.0.0', port=5000, debug=False, threaded=False)

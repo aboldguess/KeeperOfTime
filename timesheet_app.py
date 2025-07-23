@@ -298,8 +298,37 @@ def logout():
 @app.route('/user_dashboard')
 @login_required
 def user_dashboard():
-    """User dashboard."""
-    return render_template('user_dashboard.html')
+    """User dashboard with simple statistics."""
+    today = date.today()
+    # Sum hours for the current month for the logged in user
+    total_hours_month = db.session.query(db.func.sum(Timesheet.hours)).filter(
+        Timesheet.user_id == current_user.id,
+        db.extract('year', Timesheet.date) == today.year,
+        db.extract('month', Timesheet.date) == today.month
+    ).scalar() or 0
+
+    # Get remaining leave balance
+    leave_balance = LeaveBalance.query.filter_by(user_id=current_user.id).first()
+    remaining_leave = 0
+    if leave_balance:
+        remaining_leave = leave_balance.total_leave - leave_balance.used_leave
+
+    # Count upcoming approved leave requests
+    upcoming_leave = LeaveRequest.query.filter(
+        LeaveRequest.user_id == current_user.id,
+        LeaveRequest.status == 'Approved',
+        LeaveRequest.start_date >= today
+    ).count()
+
+    month_year = today.strftime('%B %Y')
+
+    return render_template(
+        'user_dashboard.html',
+        total_hours_month=total_hours_month,
+        remaining_leave=remaining_leave,
+        upcoming_leave=upcoming_leave,
+        month_year=month_year
+    )
 
 @app.route('/user_dashboard/timesheets', methods=['GET'])
 @app.route('/user_dashboard/timesheets/<int:year>/<int:month>', methods=['GET'])
@@ -383,8 +412,43 @@ def get_tasks(work_package_id):
 @app.route('/admin_dashboard')
 @admin_required
 def admin_dashboard():
-    """Admin dashboard."""
-    return render_template('admin_dashboard.html')
+    """Admin dashboard showing high level statistics."""
+    # Basic counts for quick overview
+    user_count = User.query.count()
+    project_count = Project.query.count()
+    total_hours = db.session.query(db.func.sum(Timesheet.hours)).scalar() or 0
+    pending_leave_count = LeaveRequest.query.filter_by(status='Pending').count()
+
+    return render_template(
+        'admin_dashboard.html',
+        user_count=user_count,
+        project_count=project_count,
+        total_hours=total_hours,
+        pending_leave_count=pending_leave_count
+    )
+
+
+@app.route('/admin_dashboard/reports')
+@admin_required
+def admin_reports():
+    """Aggregated reports providing managerial insights."""
+    # Total hours logged per user
+    user_hours = db.session.query(
+        User.username,
+        db.func.sum(Timesheet.hours)
+    ).join(Timesheet).group_by(User.id).all()
+
+    # Total hours logged per project
+    project_hours = db.session.query(
+        Project.name,
+        db.func.sum(Timesheet.hours)
+    ).join(WorkPackage).join(Task).join(Timesheet).group_by(Project.id).all()
+
+    return render_template(
+        'reports.html',
+        user_hours=user_hours,
+        project_hours=project_hours
+    )
 
 @app.route('/admin_dashboard/projects', methods=['GET', 'POST'])
 @admin_required

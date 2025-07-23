@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a> /
+    <span>Reports</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>Reports</h2>
+<h3>Total Hours by User</h3>
+<table>
+    <thead>
+        <tr><th>User</th><th>Total Hours</th></tr>
+    </thead>
+    <tbody>
+    {% for username, hours in user_hours %}
+        <tr><td>{{ username }}</td><td>{{ hours or 0 }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total Hours by Project</h3>
+<table>
+    <thead>
+        <tr><th>Project</th><th>Total Hours</th></tr>
+    </thead>
+    <tbody>
+    {% for name, hours in project_hours %}
+        <tr><td>{{ name }}</td><td>{{ hours or 0 }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

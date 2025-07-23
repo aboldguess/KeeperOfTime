@@ -300,3 +300,9 @@ form textarea {
     max-width: 900px;
     margin: 0 auto;
 }
+
+/* Styles for nested tables used in expandable reports */
+table.nested {
+    margin-top: 10px;
+    width: 100%;
+}

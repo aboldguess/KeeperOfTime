@@ -434,12 +434,14 @@ def admin_reports():
     """Aggregated reports providing managerial insights."""
     # Total hours logged per user
     user_hours = db.session.query(
+        User.id,
         User.username,
         db.func.sum(Timesheet.hours)
     ).join(Timesheet).group_by(User.id).all()
 
     # Total hours logged per project
     project_hours = db.session.query(
+        Project.id,
         Project.name,
         db.func.sum(Timesheet.hours)
     ).join(WorkPackage).join(Task).join(Timesheet).group_by(Project.id).all()
@@ -449,6 +451,66 @@ def admin_reports():
         user_hours=user_hours,
         project_hours=project_hours
     )
+
+@app.route('/admin_dashboard/reports/user/<int:user_id>')
+@admin_required
+def report_user_detail(user_id):
+    """Return hours for a user broken down by project, work package and task."""
+    # Aggregate hours by project/work package/task for the user
+    entries = (
+        db.session.query(
+            Project.name.label('project'),
+            WorkPackage.name.label('work_package'),
+            Task.name.label('task'),
+            db.func.sum(Timesheet.hours).label('hours')
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .join(WorkPackage, Task.work_package_id == WorkPackage.id)
+        .join(Project, WorkPackage.project_id == Project.id)
+        .filter(Timesheet.user_id == user_id)
+        .group_by(Project.name, WorkPackage.name, Task.name)
+        .all()
+    )
+
+    result = [
+        {
+            'project': row.project,
+            'work_package': row.work_package,
+            'task': row.task,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
+
+@app.route('/admin_dashboard/reports/project/<int:project_id>')
+@admin_required
+def report_project_detail(project_id):
+    """Return hours for a project broken down by work package and task."""
+    entries = (
+        db.session.query(
+            WorkPackage.name.label('work_package'),
+            Task.name.label('task'),
+            db.func.sum(Timesheet.hours).label('hours')
+        )
+        .join(Task, Timesheet.task_id == Task.id)
+        .join(WorkPackage, Task.work_package_id == WorkPackage.id)
+        .filter(WorkPackage.project_id == project_id)
+        .group_by(WorkPackage.name, Task.name)
+        .all()
+    )
+
+    result = [
+        {
+            'work_package': row.work_package,
+            'task': row.task,
+            'hours': row.hours or 0,
+        }
+        for row in entries
+    ]
+
+    return jsonify(result)
 
 @app.route('/admin_dashboard/projects', methods=['GET', 'POST'])
 @admin_required

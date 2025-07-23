@@ -18,6 +18,8 @@ Example projects with sample work packages and tasks are automatically added so 
 
 Tasks now support optional start and end dates. When creating a task under a work package you can specify when the work is scheduled to begin and finish. These dates are visible throughout the admin dashboards to aid basic project planning.
 
+Projects, work packages and tasks can also record a budget of planned hours. When adding new items through the admin interface simply enter the expected hours and the value will be displayed alongside actual hours booked.
+
 ## Development
 
 Changes to the database schema can be handled via `Flask-Migrate` using the helper script `database_migrate_tool.py`.

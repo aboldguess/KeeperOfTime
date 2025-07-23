@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th>Work Package Name</th>
+            <th>Budget (hrs)</th>
             <th>Total Hours</th>
             <th>Users</th>
             <th>Details</th>
@@ -24,6 +25,7 @@
         {% for item in wp_data %}
         <tr>
             <td>{{ item.work_package.name }}</td>
+            <td>{{ item.work_package.budget_hours or 'N/A' }}</td>
             <td>{{ item.total_hours }}</td>
             <td>{{ item.users | join(', ') }}</td>
             <td><a href="{{ url_for('work_package_detail', work_package_id=item.work_package.id) }}">View Details</a></td>
@@ -33,6 +35,7 @@
         <tr>
             <form method="POST" action="{{ url_for('project_detail', project_id=project.id) }}">
                 <td><input type="text" name="work_package_name" placeholder="New Work Package Name" required></td>
+                <td><input type="number" step="0.1" name="budget_hours" placeholder="Hours"></td>
                 <td colspan="2"></td>
                 <td><button type="submit">Add Work Package</button></td>
             </form>

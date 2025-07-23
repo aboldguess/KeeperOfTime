@@ -16,7 +16,8 @@
 <h2>Timesheet Entries for {{ user.username }} on Task: {{ task.name }}</h2>
 <p>
     Start: {{ task.start_date or 'N/A' }}<br>
-    End: {{ task.end_date or 'N/A' }}
+    End: {{ task.end_date or 'N/A' }}<br>
+    Budget: {{ task.budget_hours or 'N/A' }} hrs
 </p>
 <table>
     <thead>

@@ -701,7 +701,9 @@ def manage_leave_requests():
             flash(f'Leave request {leave_request.id} rejected.', 'danger')
 
     # Fetch leave requests
-    leave_requests = LeaveRequest.query.options(db.joinedload(LeaveRequest.user)).order_by(LeaveRequest.timestamp.desc()).all()
+    # joinedload eager loads the related User objects to reduce query count
+    # using the joinedload function from SQLAlchemy ORM, not from the db object
+    leave_requests = LeaveRequest.query.options(joinedload(LeaveRequest.user)).order_by(LeaveRequest.timestamp.desc()).all()
     return render_template('admin_leave_requests.html', leave_requests=leave_requests)
 
 @app.route('/admin_dashboard/leave_balances', methods=['GET', 'POST'])

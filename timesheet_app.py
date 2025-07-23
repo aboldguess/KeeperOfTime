@@ -321,6 +321,8 @@ def init_example_projects():
             db.session.add(project)
             db.session.flush()  # Ensure project.id is available
 
+            # day_offset increments in weeks so each task has a basic timeline
+            day_offset = 0
             for pkg in proj['packages']:
                 work_package = WorkPackage(
                     name=pkg['name'],
@@ -329,11 +331,18 @@ def init_example_projects():
                 )
                 db.session.add(work_package)
                 db.session.flush()
+
                 for task_name in pkg['tasks']:
+                    start_date = date.today() + timedelta(days=day_offset)
+                    end_date = start_date + timedelta(days=7)
+                    # Move the offset forward one week for the next task
+                    day_offset += 7
                     task = Task(
                         name=task_name,
                         work_package_id=work_package.id,
-                        budget_hours=10
+                        budget_hours=10,
+                        start_date=start_date,
+                        end_date=end_date
                     )
                     db.session.add(task)
 
@@ -362,6 +371,8 @@ def create_dummy_project():
     db.session.flush()  # Ensure project.id is available
 
     # Create three work packages each with three tasks
+    # Base date used for generating sequential task schedules
+    base_date = date.today()
     for i in range(1, 4):
         wp = WorkPackage(
             name=f'Work package #{i}',
@@ -371,10 +382,16 @@ def create_dummy_project():
         db.session.add(wp)
         db.session.flush()
         for j in range(1, 4):
+            # Offset ensures each task starts one week after the previous
+            offset = ((i - 1) * 3 + (j - 1)) * 7
+            start_date = base_date + timedelta(days=offset)
+            end_date = start_date + timedelta(days=7)
             task = Task(
                 name=f'Task #{j}',
                 work_package_id=wp.id,
-                budget_hours=20
+                budget_hours=20,
+                start_date=start_date,
+                end_date=end_date
             )
             db.session.add(task)
 

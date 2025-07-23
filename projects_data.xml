@@ -1,13 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
 <projects>
   <project>
-    <name>SSENT</name>
-    <description>asdf</description>
+    <name>Project Alpha</name>
+    <description>New website launch</description>
     <tasks />
     </project>
   <project>
-    <name>asdasd</name>
-    <description>asd</description>
+    <name>Project Beta</name>
+    <description>Mobile app development</description>
+    <tasks />
+    </project>
+  <project>
+    <name>Project Gamma</name>
+    <description>Data analysis pipeline</description>
     <tasks />
     </project>
   </projects>

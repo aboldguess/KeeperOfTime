@@ -30,6 +30,7 @@ from functools import wraps
 import os
 import calendar  # For month names
 from sqlalchemy.orm import joinedload
+from sqlalchemy import inspect, text
 from calendar import HTMLCalendar
 from waitress import serve
 import random
@@ -45,6 +46,30 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+# ------------------------------------------------------------
+# Database schema updates
+# ------------------------------------------------------------
+
+def apply_schema_updates():
+    """Add missing columns to existing SQLite DB for backward compatibility."""
+    inspector = inspect(db.engine)
+
+    def add_column(table: str, name: str, col_type: str):
+        """Helper to add column using raw SQL if it's missing."""
+        columns = [c['name'] for c in inspector.get_columns(table)]
+        if name not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text(f'ALTER TABLE {table} ADD COLUMN {name} {col_type}'))
+
+    # Ensure new budget fields exist
+    add_column('project', 'budget_hours', 'FLOAT')
+    add_column('work_package', 'budget_hours', 'FLOAT')
+
+    # Task table received several new optional columns
+    add_column('task', 'start_date', 'DATE')
+    add_column('task', 'end_date', 'DATE')
+    add_column('task', 'budget_hours', 'FLOAT')
 
 
 
@@ -1347,6 +1372,10 @@ def dummy_data_page():
 
 if __name__ == '__main__':
     with app.app_context():
+        # Ensure existing installations have all required columns
+        apply_schema_updates()
+
+        # Create any tables that are missing
         db.create_all()
 
         # Create an admin user if not exists

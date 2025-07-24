@@ -62,6 +62,13 @@
         }
     });
 
+    // Adjust task list row heights to exactly match the Gantt chart rows
+    var rowHeight = gantt.options.bar_height + gantt.options.padding;
+    document.querySelectorAll('#task-list .task-name').forEach(function(el) {
+        el.style.height = rowHeight + 'px';
+        el.style.lineHeight = rowHeight + 'px';
+    });
+
     // Update the chart when the user selects a new view mode
     document.getElementById('view-mode-select').addEventListener('change', function() {
         gantt.change_view_mode(this.value);

@@ -349,8 +349,14 @@ tr.level-3 td { padding-left: 60px; }
  * prevents extra spacing between the list and the chart bars.
  */
 #task-list .task-name {
-    height: 40px;      /* match gantt row height (20 bar + 20 padding) */
-    line-height: 40px; /* vertically center text within each row */
+    /*
+     * The Gantt library may adjust bar and padding sizes which changes the
+     * overall row height. JavaScript dynamically sets height and line-height
+     * to match the chart after it is initialised. These values act only as a
+     * fallback if scripting fails for any reason.
+     */
+    height: 40px;
+    line-height: 40px;
     padding: 0 10px;
     border-bottom: 1px solid #ccc;
 }

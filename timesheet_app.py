@@ -1054,11 +1054,13 @@ def project_gantt(project_id):
     """Display a Gantt chart for all tasks under a project."""
     project = Project.query.get_or_404(project_id)
 
-    # Collect each task alongside total hours booked so we can
-    # determine the percentage of its budget that has been spent.
+    # Query tasks grouped by work package including total hours spent
     entries = (
         db.session.query(
             Task,
+            WorkPackage.id.label('wp_id'),
+            WorkPackage.name.label('wp_name'),
+            WorkPackage.budget_hours.label('wp_budget'),
             db.func.sum(Timesheet.hours).label('spent')
         )
         .join(WorkPackage)
@@ -1068,16 +1070,18 @@ def project_gantt(project_id):
         .all()
     )
 
-    # Build the task data structure expected by frappe-gantt
-    tasks = []
-    for task, spent in entries:
+    # Organise tasks under their work packages
+    wp_dict = {}
+    for task, wp_id, wp_name, wp_budget, spent in entries:
         spent = spent or 0
+
+        # Percentage of task budget used
         if task.budget_hours and task.budget_hours > 0:
             percent = (spent / task.budget_hours) * 100
         else:
             percent = 0
 
-        # Determine styling class based on budget consumption
+        # Styling based on budget consumption
         if percent < 50:
             cls = 'budget-low'
         elif percent < 80:
@@ -1085,16 +1089,70 @@ def project_gantt(project_id):
         else:
             cls = 'budget-high'
 
-        tasks.append({
-            'id': task.id,
+        task_data = {
+            'id': f'task-{task.id}',
             'name': task.name,
             'start': (task.start_date or date.today()).isoformat(),
             'end': (task.end_date or date.today()).isoformat(),
             'progress': task.actual_progress or 0,
             'custom_class': cls,
-        })
+            'spent': spent,
+            'budget': task.budget_hours or 0,
+        }
 
-    return render_template('project_gantt.html', project=project, tasks=tasks)
+        if wp_id not in wp_dict:
+            wp_dict[wp_id] = {
+                'name': wp_name,
+                'budget': wp_budget,
+                'tasks': [],
+                'start': None,
+                'end': None,
+                'spent': 0,
+                'progress_acc': 0,
+            }
+        wpd = wp_dict[wp_id]
+        wpd['tasks'].append(task_data)
+        wpd['spent'] += spent
+        wpd['progress_acc'] += task.actual_progress or 0
+
+        t_start = task.start_date or date.today()
+        t_end = task.end_date or date.today()
+        if wpd['start'] is None or t_start < wpd['start']:
+            wpd['start'] = t_start
+        if wpd['end'] is None or t_end > wpd['end']:
+            wpd['end'] = t_end
+
+    # Build bars for work packages and tasks
+    tasks = []
+    names = []
+    for wp_id, info in wp_dict.items():
+        num_tasks = len(info['tasks'])
+        progress = (info['progress_acc'] / num_tasks) if num_tasks else 0
+        budget = info['budget'] or 0
+        spent_percent = (info['spent'] / budget) * 100 if budget else 0
+
+        if spent_percent < 50:
+            wp_cls = 'wp-budget-low'
+        elif spent_percent < 80:
+            wp_cls = 'wp-budget-mid'
+        else:
+            wp_cls = 'wp-budget-high'
+
+        tasks.append({
+            'id': f'wp-{wp_id}',
+            'name': info['name'],
+            'start': info['start'].isoformat() if info['start'] else date.today().isoformat(),
+            'end': info['end'].isoformat() if info['end'] else date.today().isoformat(),
+            'progress': progress,
+            'custom_class': wp_cls,
+        })
+        names.append({'label': info['name'], 'id': f'wp-{wp_id}', 'is_wp': True})
+
+        for t in info['tasks']:
+            tasks.append(t)
+            names.append({'label': t['name'], 'id': t['id'], 'is_wp': False})
+
+    return render_template('project_gantt.html', project=project, tasks=tasks, names=names)
 
 @app.route('/admin_dashboard/work_packages/<int:work_package_id>', methods=['GET', 'POST'])
 @admin_required

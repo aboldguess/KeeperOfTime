@@ -11,7 +11,14 @@
 
 {% block content %}
 <h2>Gantt Chart - {{ project.name }}</h2>
-<div id="gantt"></div>
+<div class="gantt-container">
+    <div id="task-list">
+    {% for item in names %}
+        <div class="task-name{% if item.is_wp %} wp-name{% endif %}">{{ item.label }}</div>
+    {% endfor %}
+    </div>
+    <div id="gantt"></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.css">
 <script>

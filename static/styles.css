@@ -342,10 +342,15 @@ tr.level-3 td { padding-left: 60px; }
     margin-top: 75px; /* offset for gantt header (upper + lower) */
 }
 
-/* Each task row must match the library's row height (bar_height + padding). */
+/*
+ * Each task label row needs to align exactly with the library's row height.
+ * Frappe Gantt uses a default bar_height of 20px with ~20px of padding,
+ * giving a row height of about 40px.  Keeping our label rows the same
+ * prevents extra spacing between the list and the chart bars.
+ */
 #task-list .task-name {
-    height: 48px;      /* default bar height 30 + padding 18 */
-    line-height: 48px; /* vertically center text within each row */
+    height: 40px;      /* match gantt row height (20 bar + 20 padding) */
+    line-height: 40px; /* vertically center text within each row */
     padding: 0 10px;
     border-bottom: 1px solid #ccc;
 }

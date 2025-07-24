@@ -339,11 +339,13 @@ tr.level-3 td { padding-left: 60px; }
 #task-list {
     min-width: 200px;
     background-color: #f8f8f8;
+    margin-top: 75px; /* offset for gantt header (upper + lower) */
 }
 
+/* Each task row must match the library's row height (bar_height + padding). */
 #task-list .task-name {
-    height: 40px;
-    line-height: 40px;
+    height: 48px;      /* default bar height 30 + padding 18 */
+    line-height: 48px; /* vertically center text within each row */
     padding: 0 10px;
     border-bottom: 1px solid #ccc;
 }

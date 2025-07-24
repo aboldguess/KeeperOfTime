@@ -11,6 +11,13 @@
 
 {% block content %}
 <h2>Gantt Chart - {{ project.name }}</h2>
+<label for="view-mode-select">View:</label>
+<select id="view-mode-select">
+    <option value="Day">Day</option>
+    <option value="Week">Week</option>
+    <option value="Month">Month</option>
+    <option value="Quarter">Quarter</option>
+</select>
 <div class="gantt-container">
     <div id="task-list">
     {% for item in names %}
@@ -25,14 +32,39 @@
     // Tasks data injected from Flask
     var tasks = {{ tasks|tojson }};
 
-    // Initialise the Gantt chart
+    // Additional view mode showing quarters of the year
+    var quarterView = {
+        name: 'Quarter',
+        padding: '1y',
+        step: '3m',
+        column_width: 120,
+        date_format: 'YYYY-MM',
+        lower_text: function(d) {
+            // Quarter number for lower header
+            return 'Q' + (Math.floor(d.getMonth() / 3) + 1);
+        },
+        upper_text: function(d, ld) {
+            // Display year when it changes
+            return !ld || d.getFullYear() !== ld.getFullYear() ? d.getFullYear() : '';
+        },
+        thick_line: function(d) { return d.getMonth() % 3 === 0; }
+    };
+
+    // Initialise the Gantt chart with view selection enabled
     var gantt = new Gantt("#gantt", tasks, {
+        view_mode_select: true,
+        view_modes: ['Day', 'Week', 'Month', quarterView],
         custom_popup_html: function(task) {
             return '<div class="details-container">' +
                    '<b>' + task.name + '</b><br>' +
                    '<button onclick="editProgress(' + task.id + ',' + task.progress + ')">Edit progress</button>' +
                    '</div>';
         }
+    });
+
+    // Update the chart when the user selects a new view mode
+    document.getElementById('view-mode-select').addEventListener('change', function() {
+        gantt.change_view_mode(this.value);
     });
 
     // Prompt for new progress percentage then update via AJAX

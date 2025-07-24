@@ -325,3 +325,36 @@ tr.level-3 td { padding-left: 60px; }
 .bar-budget-mid { fill: #ff9f38; }
 .bar-budget-high { fill: #e74c3c; }
 
+/* Work package bar colours */
+.bar-wp-budget-low { fill: #4a90e2; }
+.bar-wp-budget-mid { fill: #f0ad4e; }
+.bar-wp-budget-high { fill: #d9534f; }
+
+/* Layout for the gantt chart and task list */
+.gantt-container {
+    display: flex;
+    width: 100%;
+}
+
+#task-list {
+    min-width: 200px;
+    background-color: #f8f8f8;
+}
+
+#task-list .task-name {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+#task-list .wp-name {
+    font-weight: bold;
+    background-color: #e6e6ff;
+}
+
+#gantt {
+    flex-grow: 1;
+    width: 100%;
+}
+

@@ -25,6 +25,17 @@ python3 rpi_server.py 8080  # listens on port 8080
 
 If no port argument is provided the server defaults to `8000`.
 
+## Windows Quick Start
+
+Run `windows_server.py` to automatically install dependencies, prepare the database and launch the application. An optional port number can be passed:
+
+```bash
+python windows_server.py 5000  # listens on port 5000
+```
+
+If omitted, the app uses port `8000`.
+
+
 ## Project Management
 
 Tasks now support optional start and end dates. When creating a task under a work package you can specify when the work is scheduled to begin and finish. These dates are visible throughout the admin dashboards to aid basic project planning.

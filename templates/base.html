@@ -9,7 +9,32 @@
 </head>
 <body>
     <header>
-        <h1>The Keeper Of Time</h1>
+        <nav class="navbar">
+            <div class="navbar-left">
+                <h1>The Keeper Of Time</h1>
+            </div>
+            <div class="navbar-right">
+                {% if current_user.is_authenticated %}
+                <div class="profile-menu">
+                    <!-- Circle with user's initial acts as profile picture -->
+                    <div class="profile-button" id="profileMenuButton">
+                        {{ current_user.username[0]|upper }}
+                    </div>
+                    <!-- Dropdown menu with profile actions -->
+                    <div class="dropdown-content" id="profileDropdown">
+                        <a href="{{ url_for('manage_profiles') }}">Manage Profiles</a>
+                        <a href="{{ url_for('learning_zone') }}">Learning Zone</a>
+                        <a href="{{ url_for('my_details') }}">My Details</a>
+                        <a href="{{ url_for('subscription_details') }}">Subscription Details</a>
+                        {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('users_page') }}">Manage Users</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}">Sign out</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
     </header>
     <div class="container">
         {% include 'sidebar.html' %}
@@ -30,5 +55,21 @@
             {% endblock %}
         </div>
     </div>
+    <!-- Simple script to toggle profile dropdown and close when clicking away -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('profileMenuButton');
+            const dropdown = document.getElementById('profileDropdown');
+            if (button) {
+                button.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    dropdown.classList.toggle('show');
+                });
+                window.addEventListener('click', function() {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

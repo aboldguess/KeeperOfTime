@@ -5,11 +5,45 @@ KeeperOfTime is a small Flask application used to track time on projects and man
 ## Setup
 
 1. Create and activate a Python virtual environment.
+
+   **Linux / Raspberry Pi**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+   **Windows**
+   ```powershell
+   python -m venv .venv
+   .venv\Scripts\activate
+   ```
+
 2. Install dependencies using:
    ```bash
-   python -m pip install -r requirements.txt
+   pip install -r requirements.txt
    ```
-3. Run the application with `python3 timesheet_app.py`.
+
+3. Run the application:
+
+   ```bash
+   python3 timesheet_app.py
+   ```
+
+   To change the port or switch to the Flask development server, set the following environment variables before running:
+
+   **Linux / Raspberry Pi**
+   ```bash
+   export KOT_PORT=5000          # optional port number
+   export KOT_PRODUCTION=false   # use Flask's debug server
+   python3 timesheet_app.py
+   ```
+
+   **Windows**
+   ```powershell
+   set KOT_PORT=5000
+   set KOT_PRODUCTION=false
+   python timesheet_app.py
+   ```
 
 The default SQLite database is stored in `instance/timesheet_app.db`. On first run an admin account is created with username `admin` and password `admin`.
 Example projects with sample work packages and tasks are automatically added so you can explore the interface immediately. Administrators can manage these records from the **Dummy Data** page. When dummy projects are created through this page each task is given a simple start and end date along with budget hours so reports show meaningful schedules from the outset.

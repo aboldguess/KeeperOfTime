@@ -572,6 +572,38 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
+@app.route('/profile/manage_profiles')
+@login_required
+def manage_profiles():
+    """Page for users to manage their profile settings."""
+    app.logger.debug("%s opened Manage Profiles", current_user.username)
+    return render_template('manage_profiles.html')
+
+
+@app.route('/profile/learning_zone')
+@login_required
+def learning_zone():
+    """Placeholder page for training materials."""
+    app.logger.debug("%s opened Learning Zone", current_user.username)
+    return render_template('learning_zone.html')
+
+
+@app.route('/profile/my_details')
+@login_required
+def my_details():
+    """Display current user's account details."""
+    app.logger.debug("%s opened My Details", current_user.username)
+    return render_template('my_details.html')
+
+
+@app.route('/profile/subscription')
+@login_required
+def subscription_details():
+    """Show subscription information for the current user."""
+    app.logger.debug("%s opened Subscription Details", current_user.username)
+    return render_template('subscription_details.html')
+
 @app.route('/user_dashboard')
 @login_required
 def user_dashboard():
@@ -1554,6 +1586,13 @@ if __name__ == '__main__':
         # Populate dummy data so the UI has content immediately
         init_dummy_data()
 
-    #app.run(debug=True)
-    #app.run(host='0.0.0.0', port=5000, debug=False, threaded=False)
-    serve(app, host='0.0.0.0', port=8000)
+    # Determine runtime configuration
+    port = int(os.environ.get('KOT_PORT', 8000))
+    use_production = os.environ.get('KOT_PRODUCTION', 'true').lower() == 'true'
+
+    if use_production:
+        # Use Waitress for a production-ready server
+        serve(app, host='0.0.0.0', port=port)
+    else:
+        # Development server with debug output for easier troubleshooting
+        app.run(host='0.0.0.0', port=port, debug=True)
